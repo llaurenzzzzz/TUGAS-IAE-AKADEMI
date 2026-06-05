@@ -1,9 +1,59 @@
 services:
+  product-db:
+    image: mysql:8.4
+    container_name: product-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: product_db
+      MYSQL_USER: product_user
+      MYSQL_PASSWORD: product_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - product_mysql_data:/var/lib/mysql
+    networks:
+      - microservice-network
+
+  analytics-db:
+    image: postgres:17
+    container_name: analytics-db
+    environment:
+      POSTGRES_DB: analytics_db
+      POSTGRES_USER: analytics_user
+      POSTGRES_PASSWORD: analytics_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - analytics_postgres_data:/var/lib/postgresql/data
+    networks:
+      - microservice-network
+
+  order-db:
+    image: mongo:8
+    container_name: order-db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: order_user
+      MONGO_INITDB_ROOT_PASSWORD: order_password
+      MONGO_INITDB_DATABASE: order_db
+    ports:
+      - "27018:27017"
+    volumes:
+      - order_mongo_data:/data/db
+    networks:
+      - microservice-network
+
   product-service:
     build: ./product-service
     container_name: product-service
     ports:
       - "3001:3001"
+    environment:
+      DB_HOST: product-db
+      DB_NAME: product_db
+      DB_USER: product_user
+      DB_PASSWORD: product_password
+    depends_on:
+      - product-db
     networks:
       - microservice-network
 
@@ -13,8 +63,10 @@ services:
     ports:
       - "3002:3002"
     environment:
-      - PRODUCT_SERVICE_URL=http://product-service:3001
+      PRODUCT_SERVICE_URL: http://product-service:3001
+      MONGO_URI: mongodb://order_user:order_password@order-db:27017/order_db?authSource=admin
     depends_on:
+      - order-db
       - product-service
     networks:
       - microservice-network
@@ -23,7 +75,15 @@ services:
     build: ./python-service
     container_name: python-service
     ports:
-      - "5000:5000"
+      - "5001:5000"
+    environment:
+      DB_HOST: analytics-db
+      DB_NAME: analytics_db
+      DB_USER: analytics_user
+      DB_PASSWORD: analytics_password
+      DB_PORT: 5432
+    depends_on:
+      - analytics-db
     networks:
       - microservice-network
 
@@ -41,10 +101,29 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - PRODUCT_SERVICE_URL=http://product-service:3001
-      - ORDER_SERVICE_URL=http://order-service:3002
-      - PYTHON_SERVICE_URL=http://python-service:5000
-      - LARAVEL_SERVICE_URL=http://laravel-service:8000
+      PRODUCT_SERVICE_URL: http://product-service:3001
+      ORDER_SERVICE_URL: http://order-service:3002
+      PYTHON_SERVICE_URL: http://python-service:5000
+      LARAVEL_SERVICE_URL: http://laravel-service:8000
+    depends_on:
+      - product-service
+      - order-service
+      - python-service
+      - laravel-service
+    networks:
+      - microservice-network
+
+  graphql-gateway:
+    build: ./graphql-gateway
+    container_name: graphql-gateway
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      PRODUCT_SERVICE_URL: http://product-service:3001
+      ORDER_SERVICE_URL: http://order-service:3002
+      PYTHON_SERVICE_URL: http://python-service:5000
+      LARAVEL_SERVICE_URL: http://laravel-service:8000
     depends_on:
       - product-service
       - order-service
@@ -56,3 +135,8 @@ services:
 networks:
   microservice-network:
     driver: bridge
+
+volumes:
+  product_mysql_data:
+  analytics_postgres_data:
+  order_mongo_data:
