@@ -1,0 +1,160 @@
+services:
+  mahasiswa-db:
+    image: mysql:8.4
+    container_name: mahasiswa-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: mahasiswa_db
+      MYSQL_USER: mahasiswa_user
+      MYSQL_PASSWORD: mahasiswa_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mahasiswa_mysql_data:/var/lib/mysql
+    networks:
+      - akademi-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+
+  dosen-db:
+    image: postgres:17
+    container_name: dosen-db
+    environment:
+      POSTGRES_DB: dosen_db
+      POSTGRES_USER: dosen_user
+      POSTGRES_PASSWORD: dosen_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - dosen_postgres_data:/var/lib/postgresql/data
+    networks:
+      - akademi-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dosen_user -d dosen_db"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+
+  jadwal-db:
+    image: mongo:8
+    container_name: jadwal-db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: jadwal_user
+      MONGO_INITDB_ROOT_PASSWORD: jadwal_password
+      MONGO_INITDB_DATABASE: jadwal_db
+    ports:
+      - "27018:27017"
+    volumes:
+      - jadwal_mongo_data:/data/db
+    networks:
+      - akademi-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+
+  mahasiswa-service:
+    build: ./mahasiswa-service
+    container_name: mahasiswa-service
+    ports:
+      - "3001:3001"
+    environment:
+      DB_HOST: mahasiswa-db
+      DB_NAME: mahasiswa_db
+      DB_USER: mahasiswa_user
+      DB_PASSWORD: mahasiswa_password
+    depends_on:
+      mahasiswa-db:
+        condition: service_healthy
+    networks:
+      - akademi-network
+
+  jadwal-service:
+    build: ./jadwal-service
+    container_name: jadwal-service
+    ports:
+      - "3002:3002"
+    environment:
+      MAHASISWA_SERVICE_URL: http://mahasiswa-service:3001
+      MONGO_URI: mongodb://jadwal_user:jadwal_password@jadwal-db:27017/jadwal_db?authSource=admin
+    depends_on:
+      jadwal-db:
+        condition: service_healthy
+      mahasiswa-service:
+        condition: service_started
+    networks:
+      - akademi-network
+
+  dosen-service:
+    build: ./dosen-service
+    container_name: dosen-service
+    ports:
+      - "5001:5000"
+    environment:
+      DB_HOST: dosen-db
+      DB_NAME: dosen_db
+      DB_USER: dosen_user
+      DB_PASSWORD: dosen_password
+      DB_PORT: 5432
+    depends_on:
+      dosen-db:
+        condition: service_healthy
+    networks:
+      - akademi-network
+
+  laravel-service:
+    build: ./laravel-service
+    container_name: laravel-service
+    ports:
+      - "8000:8000"
+    networks:
+      - akademi-network
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      MAHASISWA_SERVICE_URL: http://mahasiswa-service:3001
+      JADWAL_SERVICE_URL: http://jadwal-service:3002
+      DOSEN_SERVICE_URL: http://dosen-service:5000
+      LARAVEL_SERVICE_URL: http://laravel-service:8000
+    depends_on:
+      - mahasiswa-service
+      - jadwal-service
+      - dosen-service
+      - laravel-service
+    networks:
+      - akademi-network
+
+  graphql-gateway:
+    build: ./graphql-gateway
+    container_name: graphql-gateway
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      MAHASISWA_SERVICE_URL: http://mahasiswa-service:3001
+      JADWAL_SERVICE_URL: http://jadwal-service:3002
+      DOSEN_SERVICE_URL: http://dosen-service:5000
+      LARAVEL_SERVICE_URL: http://laravel-service:8000
+    depends_on:
+      - mahasiswa-service
+      - jadwal-service
+      - dosen-service
+      - laravel-service
+    networks:
+      - akademi-network
+
+networks:
+  akademi-network:
+    driver: bridge
+
+volumes:
+  mahasiswa_mysql_data:
+  dosen_postgres_data:
+  jadwal_mongo_data:
