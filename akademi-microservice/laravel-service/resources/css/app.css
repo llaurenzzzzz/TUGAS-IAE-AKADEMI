@@ -1,3 +1,280 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .mono { font-family: 'Space Mono', monospace; }
+
+    .login-page {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+        background: url('/images/bg-login.jpg') center center / cover no-repeat;
+    }
+    .login-page::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        z-index: 0;
+    }
+
+    .login-card {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        width: 100%;
+        max-width: 900px;
+        min-height: 580px;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .card-image-panel {
+        width: 50%;
+        position: relative;
+        background: url('/images/bg-login.jpg') center center / cover no-repeat;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+    }
+    .card-image-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.25) 0%,
+            rgba(0, 0, 0, 0.1) 40%,
+            rgba(0, 0, 0, 0.6) 100%
+        );
+        z-index: 0;
+    }
+    .card-image-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        padding: 36px 32px;
+    }
+    .card-image-bottom {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    .card-image-title {
+        font-size: 28px;
+        font-weight: 800;
+        color: white;
+        line-height: 1.25;
+        margin: 0;
+        text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    }
+    .card-image-title em {
+        font-style: normal;
+        background: linear-gradient(135deg, #a5b4fc, #e879f9);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background: #4f46e5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        color: white;
+    }
+    .brand-name { font-size: 13px; color: rgba(255,255,255,0.8); }
+
+    .welcome-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 99px;
+        padding: 5px 13px;
+        backdrop-filter: blur(4px);
+    }
+    .badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #a5b4fc;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+    .welcome-badge span:last-child { font-size: 10px; color: rgba(255,255,255,0.85); }
+
+    .db-list { display: flex; flex-direction: column; gap: 8px; }
+    .db-item { display: flex; align-items: center; gap: 10px; }
+    .db-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+    .db-mysql { background: rgba(12,35,64,0.8); border: 1px solid #1e3a5f; color: #60a5fa; }
+    .db-pg    { background: rgba(26,10,46,0.8); border: 1px solid #3b1f6e; color: #c084fc; }
+    .db-mongo { background: rgba(10,31,10,0.8); border: 1px solid #1a4a1a; color: #4ade80; }
+    .db-info p { margin: 0; }
+    .db-name { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.9); }
+    .db-desc { font-size: 10px; color: rgba(255,255,255,0.45); }
+    .db-badge {
+        margin-left: auto;
+        font-size: 10px;
+        background: rgba(5,46,22,0.8);
+        color: #4ade80;
+        padding: 3px 9px;
+        border-radius: 99px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .status-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #4ade80;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+    .card-form-panel {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 44px;
+    }
+    .form-wrapper { width: 100%; max-width: 320px; }
+    .form-header { margin-bottom: 36px; }
+    .form-title { font-size: 28px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0; }
+    .form-sub { font-size: 13px; color: #94a3b8; margin: 0; }
+
+    .error-msg {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(127, 29, 29, 0.08);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 10px;
+        padding: 10px 14px;
+        margin-bottom: 20px;
+    }
+    .error-msg.hidden { display: none; }
+    .error-icon { color: #ef4444; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+    .error-msg p { margin: 0; font-size: 13px; color: #ef4444; }
+
+    .field-wrap { margin-bottom: 22px; }
+    .field-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 8px;
+    }
+    .field-input {
+        width: 100%;
+        border: none;
+        border-bottom: 1.5px solid #e2e8f0;
+        padding: 10px 0;
+        font-size: 14px;
+        color: #0f172a;
+        outline: none;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background: transparent;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+    }
+    .field-input::placeholder { color: #cbd5e1; }
+    .field-input:focus { border-bottom-color: #6366f1; }
+
+    .btn-submit {
+        width: 100%;
+        padding: 14px;
+        background: #1e1b4b;
+        border: none;
+        border-radius: 11px;
+        color: white;
+        font-size: 14px;
+        font-weight: 700;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        cursor: pointer;
+        margin-top: 4px;
+        margin-bottom: 24px;
+        transition: background 0.25s, transform 0.2s;
+    }
+    .btn-submit:hover { background: #312e81; transform: translateY(-1px); }
+    .btn-submit:active { transform: translateY(0); }
+
+    .demo-box {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 12px 14px;
+        background: #f8fafc;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+    }
+    .demo-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: #eef2ff;
+        border: 1px solid #c7d2fe;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        color: #6366f1;
+        flex-shrink: 0;
+    }
+    .demo-label { font-size: 11px; color: #94a3b8; margin: 0 0 2px 0; }
+    .demo-cred { font-size: 12px; color: #6366f1; margin: 0; }
+
+    .shake { animation: shake 0.4s ease; }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25%       { transform: translateX(-8px); }
+    75%       { transform: translateX(8px); }
+}
+
+@media (max-width: 640px) {
+    .login-card { flex-direction: column; min-height: auto; border-radius: 16px; }
+    .card-image-panel { width: 100%; min-height: 220px; }
+    .card-image-title { font-size: 22px; }
+    .db-list { display: none; }
+    .card-form-panel { padding: 36px 28px; }
+}

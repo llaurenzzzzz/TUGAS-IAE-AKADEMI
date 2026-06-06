@@ -120,7 +120,11 @@ const typeDefs = `#graphql
 
   type Mutation {
     createMahasiswa(nim: String!, nama: String!, jurusan: String!, angkatan: Int!): Mahasiswa
+    updateMahasiswa(id: ID!, nim: String!, nama: String!, jurusan: String!, angkatan: Int!): Mahasiswa
+    deleteMahasiswa(id: ID!): Boolean
     createDosen(nip: String!, nama: String!, mata_kuliah: String!, email: String): Dosen
+    updateDosen(id: ID!, nip: String!, nama: String!, mata_kuliah: String!, email: String, status: String): Dosen
+    deleteDosen(id: ID!): Boolean
     createJadwal(
       mata_kuliah: String!
       kode_mk: String!
@@ -176,11 +180,29 @@ const resolvers = {
         method: "POST",
         body: JSON.stringify({ nim, nama, jurusan, angkatan })
       })).data,
+    updateMahasiswa: async (_, { id, nim, nama, jurusan, angkatan }) =>
+      (await fetchJson(`${MAHASISWA_SERVICE_URL}/mahasiswa/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({ nim, nama, jurusan, angkatan })
+      })).data,
+    deleteMahasiswa: async (_, { id }) => {
+      await fetchJson(`${MAHASISWA_SERVICE_URL}/mahasiswa/${id}`, { method: "DELETE" });
+      return true;
+    },
     createDosen: async (_, { nip, nama, mata_kuliah, email }) =>
       (await fetchJson(`${DOSEN_SERVICE_URL}/dosen`, {
         method: "POST",
         body: JSON.stringify({ nip, nama, mata_kuliah, email })
       })).data,
+    updateDosen: async (_, { id, nip, nama, mata_kuliah, email, status }) =>
+      (await fetchJson(`${DOSEN_SERVICE_URL}/dosen/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({ nip, nama, mata_kuliah, email, status })
+      })).data,
+    deleteDosen: async (_, { id }) => {
+      await fetchJson(`${DOSEN_SERVICE_URL}/dosen/${id}`, { method: "DELETE" });
+      return true;
+    },
     createJadwal: async (_, args) =>
       normalizeJadwal((await fetchJson(`${JADWAL_SERVICE_URL}/jadwal`, {
         method: "POST",

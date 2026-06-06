@@ -102,6 +102,32 @@ def create_dosen():
         "data": {"id": new_id, "nip": nip, "nama": nama, "mata_kuliah": mata_kuliah, "email": email, "status": "aktif"}
     }), 201
 
+@app.route("/dosen/<int:dosen_id>", methods=["PUT"])
+def update_dosen(dosen_id):
+    body = request.get_json()
+    nip = body.get("nip")
+    nama = body.get("nama")
+    mata_kuliah = body.get("mata_kuliah")
+    email = body.get("email")
+    status = body.get("status", "aktif")
+    if not nip or not nama or not mata_kuliah:
+        return jsonify({"message": "nip, nama, dan mata_kuliah wajib diisi"}), 400
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE dosen SET nip = %s, nama = %s, mata_kuliah = %s, email = %s, status = %s WHERE id = %s RETURNING id",
+        (nip, nama, mata_kuliah, email, status, dosen_id)
+    )
+    updated = cursor.fetchone()
+    conn.commit()
+    cursor.close()
+    if not updated:
+        return jsonify({"message": "Dosen tidak ditemukan"}), 404
+    return jsonify({
+        "service": "dosen-service",
+        "message": "Dosen berhasil diperbarui",
+        "data": {"id": dosen_id, "nip": nip, "nama": nama, "mata_kuliah": mata_kuliah, "email": email, "status": status}
+    })
+
 @app.route("/dosen/<int:dosen_id>", methods=["DELETE"])
 def delete_dosen(dosen_id):
     cursor = conn.cursor()

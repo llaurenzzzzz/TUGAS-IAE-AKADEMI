@@ -1,15 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 
-Route::get('/', [DashboardController::class, 'index']);
+Route::get('/', [AuthController::class, 'showLogin']);
+Route::get('/login', [AuthController::class, 'showLogin']);
+Route::get('/dashboard', [DashboardController::class, 'showDashboard']);
+
 Route::get('/health', function () {
     return response()->json([
         'service' => 'laravel-service',
         'status' => 'running'
     ]);
 });
+
 Route::get('/report', function () {
     return response()->json([
         'service' => 'laravel-service',
