@@ -59,6 +59,9 @@
             <button onclick="showPage('jadwal')" class="nav-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 flex items-center gap-3" id="nav-jadwal">
                 <span>📅</span><span>Jadwal</span>
             </button>
+            <button onclick="window.location.href='/timetable'" class="nav-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300 flex items-center gap-3" id="nav-timetable">
+                <span>🗓️</span><span>Timetable</span>
+            </button>
         </nav>
         <div class="p-4 border-t border-slate-800">
             <div class="flex items-center gap-3 px-4 py-3 mb-2">

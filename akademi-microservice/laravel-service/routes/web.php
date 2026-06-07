@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TimetableController;
 
 Route::get('/', [AuthController::class, 'showLogin']);
 Route::get('/login', [AuthController::class, 'showLogin']);
@@ -26,3 +27,5 @@ Route::get('/report', function () {
         ]
     ]);
 });
+
+Route::get('/timetable', [TimetableController::class, 'index']);
